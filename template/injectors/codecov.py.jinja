@@ -1,0 +1,77 @@
+# /// script
+# requires-python = ">=3.9"
+# dependencies = [
+#     "pyyaml>=6.0.2",
+# ]
+# ///
+"""
+"""
+
+from pathlib import Path
+
+import yaml
+
+
+def update_test_workflow() -> None:
+    """
+    """
+    tests_path = Path(".github/workflows/tests.yml")
+
+    # Read the existing configuration as text
+    original_content = tests_path.read_text(encoding="utf-8")
+
+    source_1 = """
+      - name: Run coverage
+        run: |
+          uvx --quiet --no-progress --with tox-uv tox run -e coverage-combine
+          uvx --quiet --no-progress --with tox-uv tox run -e coverage
+          uvx --quiet --no-progress --with tox-uv tox run --quiet --quiet -e coverage -- --format=markdown >> $GITHUB_STEP_SUMMARY
+"""
+    source_2 = """
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    environment:
+      name: coverage
+"""
+    if not (source_1 in original_content or source_2 in original_content):
+        raise ValueError("Replacement failed.")
+
+    updated_content = original_content.replace(
+      source_1,
+"""
+      - name: Run coverage
+        run: |
+          uvx --quiet --no-progress --with tox-uv tox run -e coverage-combine
+          uvx --quiet --no-progress --with tox-uv tox run -e coverage-report
+          uvx --quiet --no-progress --with tox-uv tox run -e coverage
+          uvx --quiet --no-progress --with tox-uv tox run --quiet --quiet -e coverage -- --format=markdown >> $GITHUB_STEP_SUMMARY
+      - name: Upload coverage report to CodeCov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          name: codecov-umbrella
+          verbose: true
+          flags: pytest
+          file: .tox/.coverage.xml
+          use_oidc: true
+""",
+    ).replace(
+      source_2,
+"""
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    environment:
+      name: coverage
+""",
+    )
+
+    # Write the merged content back to the file
+    tests_path.write_text(updated_content, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    update_test_workflow()

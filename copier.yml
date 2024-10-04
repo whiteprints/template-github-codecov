@@ -1,0 +1,26 @@
+_subdirectory: "template"
+_tasks:
+  - ["git", "add", "codecov.yml"]
+  - ["uv", "run", "injectors/codecov.py"]
+  - ["uv", "run", "injectors/md_files.py"]
+  - ["rm", "-r", "injectors"]
+  - command: [
+    "uvx", "--quiet", "--no-progress", "reuse", "annotate",
+    "--copyright", "{{ author }} <{{ author_email }}>",
+    "--license", "{{ code_license_id }}",
+    "--copyright-prefix", "spdx-symbol",
+    "--style", "python",
+    "codecov.yml", ".github/workflows/tests.yml",
+  ]
+    when: "{{ code_license_id != '' }}"
+  - command: [
+    "uvx", "--quiet", "--no-progress", "reuse", "annotate",
+    "--copyright", "SPDX-FileCopyrightText: {{ header }}",
+    "--license", "LicenseRef-PROPRIETARY",
+    "--style", "python",
+    "codecov.yml", ".github/workflows/tests.yml",
+  ]
+    when: "{{ code_license_id == '' }}"
+  - ["git", "add", "--update"]
+  - ["git", "commit", "--message", "feat: ✨ add CodeCov integration"]
+  - ["git", "push"]

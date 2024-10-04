@@ -1,0 +1,58 @@
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
+
+"""Update Markdown files."""
+
+
+from pathlib import Path
+
+
+def update_contributing() -> None:
+    """Update README.md."""
+    contributing_file = Path("CONTRIBUTING.md")
+    contributing = contributing_file.read_text("utf-8")
+    source = """
+  - Include unit tests; this project maintains 100% code coverage.
+"""
+    if source not in contributing:
+        raise ValueError("Replacement failed.")
+
+    contributing = contributing.replace(
+        source,
+"""
+  - Include unit tests; this project maintains [100% code coverage](https://codecov.io/gh/{{ organisation }}/{% include pathjoin('includes', 'project_slug.jinja') %}).
+"""
+    )
+    contributing_file.write_text(contributing, encoding="utf-8")
+
+
+def update_readme() -> None:
+    """Update README.md."""
+    readme_file = Path("README.md")
+    readme = readme_file.read_text("utf-8")
+    source = """
+        <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/"><img alt="contributor covenant badge" src="https://img.shields.io/badge/Contributor_Covenant-2.1-4BAAAA.svg?logo=contributorcovenant"/></a>
+"""
+    if source not in readme:
+        raise ValueError("Replacement failed.")
+
+    readme = readme.replace(
+        source,
+"""
+        <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/"><img alt="contributor covenant badge" src="https://img.shields.io/badge/Contributor_Covenant-2.1-4BAAAA.svg?logo=contributorcovenant"/></a>
+        <a href="https://codecov.io/gh/{{ organisation }}/{% include pathjoin('includes', 'project_slug.jinja') %}" ><img src="https://codecov.io/gh/{{ organisation }}/{% include pathjoin('includes', 'project_slug.jinja') %}/graph/badge.svg?token=YrFGtQ5D5F"/></a>
+"""
+    )
+    readme_file.write_text(readme, encoding="utf-8")
+
+
+def main() -> None:
+    update_contributing()
+    update_readme()
+
+
+if __name__ == "__main__":
+    main()
+
