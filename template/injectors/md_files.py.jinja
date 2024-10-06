@@ -42,7 +42,7 @@ def update_readme() -> None:
         source,
 """
         <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/"><img alt="contributor covenant badge" src="https://img.shields.io/badge/Contributor_Covenant-2.1-4BAAAA.svg?logo=contributorcovenant"/></a>
-        <a href="https://codecov.io/gh/{{ organisation }}/{% include pathjoin('includes', 'project_slug.jinja') %}" ><img src="https://codecov.io/gh/{{ organisation }}/{% include pathjoin('includes', 'project_slug.jinja') %}/graph/badge.svg?token=YrFGtQ5D5F"/></a>
+        <a href="https://codecov.io/gh/{{ organisation }}/{% include pathjoin('includes', 'project_slug.jinja') %}" ><img alt="codecov badge" src="https://codecov.io/gh/{{ organisation }}/{% include pathjoin('includes', 'project_slug.jinja') %}/graph/badge.svg?token="/></a>
 """
     )
     readme_file.write_text(readme, encoding="utf-8")
