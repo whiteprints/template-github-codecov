@@ -12,7 +12,7 @@ from pathlib import Path
 import yaml
 
 
-def update_test_workflow() -> None:
+def update_test_workflow(codecov_version: int) -> None:
     """
     """
     tests_path = Path(".github/workflows/tests.yml")
@@ -39,7 +39,7 @@ def update_test_workflow() -> None:
 
     updated_content = original_content.replace(
       source_1,
-"""
+f"""
       - name: Run coverage
         run: |
           uvx --quiet --no-progress --with tox-uv tox run -e coverage-combine
@@ -48,7 +48,7 @@ def update_test_workflow() -> None:
           uvx --quiet --no-progress --with tox-uv tox run --quiet --quiet -e coverage -- --format=markdown >> $GITHUB_STEP_SUMMARY
       - name: Upload coverage report to CodeCov
         if: always()
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v{codecov_version}
         with:
           name: codecov-umbrella
           verbose: true
@@ -74,4 +74,4 @@ def update_test_workflow() -> None:
 
 
 if __name__ == "__main__":
-    update_test_workflow()
+    update_test_workflow(codecov_version=5)
