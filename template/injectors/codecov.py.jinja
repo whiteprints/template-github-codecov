@@ -23,9 +23,10 @@ def update_test_workflow(codecov_version: int) -> None:
     source_1 = """
       - name: Run coverage
         run: |
-          uvx --quiet --no-progress --with tox-uv tox run -e coverage-combine
-          uvx --quiet --no-progress --with tox-uv tox run -e coverage
-          uvx --quiet --no-progress --with tox-uv tox run --quiet --quiet -e coverage -- --format=markdown >> $GITHUB_STEP_SUMMARY
+          just coverage-combine
+          just coverage-report
+          just coverage
+          just coverage --format=markdown >> $GITHUB_STEP_SUMMARY
 """
     source_2 = """
   coverage:
@@ -42,10 +43,10 @@ def update_test_workflow(codecov_version: int) -> None:
 f"""
       - name: Run coverage
         run: |
-          uvx --quiet --no-progress --with tox-uv tox run -e coverage-combine
-          uvx --quiet --no-progress --with tox-uv tox run -e coverage-report
-          uvx --quiet --no-progress --with tox-uv tox run -e coverage
-          uvx --quiet --no-progress --with tox-uv tox run --quiet --quiet -e coverage -- --format=markdown >> $GITHUB_STEP_SUMMARY
+          just coverage-combine
+          just coverage-report
+          just coverage
+          just coverage --format=markdown >> $GITHUB_STEP_SUMMARY
       - name: Upload coverage report to CodeCov
         if: always()
         uses: codecov/codecov-action@v{codecov_version}
@@ -53,7 +54,7 @@ f"""
           name: codecov-umbrella
           verbose: true
           flags: pytest
-          file: .tox/.coverage.xml
+          file: .just/.coverage.xml
           use_oidc: true
 """,
     ).replace(
